@@ -1,7 +1,10 @@
 <launch>
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
-  <rosparam file="$(find arthur_control)/config/arthur_control.yaml" command="load"/>
+  <!-- <rosparam file="$(find arthur_control)/config/arthur_control.yaml" command="load"/> -->
+
+  <rosparam file="$(find arthur_control)/config/arthur_position_controller.yaml" command="load"/>
+
 
   <!-- load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
