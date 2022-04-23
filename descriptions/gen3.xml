@@ -1,0 +1,356 @@
+<mujoco model="gen3_arm">
+  <compiler 
+  meshdir="meshes/" 
+  balanceinertia="true" 
+  discardvisual="false"
+  angle="radian" />
+  <option
+  integrator="RK4"
+  timestep="0.002" />
+  <size njmax="500" nconmax="100"/>
+
+  <asset>
+    <mesh name="base_link" file="base_link.STL" />
+    <mesh name="shoulder_link" file="shoulder_link.STL" />
+    <mesh name="half_arm_1_link" file="half_arm_1_link.STL" />
+    <mesh name="half_arm_2_link" file="half_arm_2_link.STL" />
+    <mesh name="forearm_link" file="forearm_link.STL" />
+    <mesh name="spherical_wrist_1_link" file="spherical_wrist_1_link.STL" />
+    <mesh name="spherical_wrist_2_link" file="spherical_wrist_2_link.STL" />
+    <mesh name="bracelet_with_vision_link" file="bracelet_with_vision_link.STL" />
+    <mesh name="ReamerAssemblyCombine" file="ReamerAssemblyCombine_xml.stl" />
+    <material name="BeigeMaterial" specular="0" shininess="0" reflectance="0" rgba="0.26 0.16 0.16796875 1" emission="0" />
+  </asset>
+
+  <actuator>
+    <motor name="shoulder_link_motor" joint="joint_1" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-39 39" forcerange="-39 39"/>
+    <motor name="half_arm_1_link_motor" joint="joint_2" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-39 39" forcerange="-39 39"/>
+    <motor name="half_arm_2_link_motor" joint="joint_3" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-39 39" forcerange="-39 39"/>
+    <motor name="forearm_link_motor" joint="joint_4" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-39 39" forcerange="-39 39"/>
+    <motor name="spherical_wrist_1_link_motor" joint="joint_5" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-9 9" forcerange="-9 9"/>
+    <motor name="spherical_wrist_2_link_motor" joint="joint_6" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-9 9" forcerange="-9 9"/>
+    <motor name="bracelet_with_vision_link_motor" joint="joint_7" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-9 9" forcerange="-9 9"/>
+  </actuator>
+
+  <worldbody>
+ 		<geom name="floor" pos="0 0 0" size="10 10 1" type="plane" rgba="1 0.83 0.61 1" material="BeigeMaterial" />
+        <!-- <geom name="wall_1" pos="0 -2.5 1" size="2.5 2.5 1" type="plane" quat="0.707107 -0.707107 0 0" rgba="0.95 0.95 0.95 1" material="BeigeMaterial" /> -->
+        <!-- <geom name="wall_2" pos="-2.5 0 1" size="2.5 2.5 1" type="plane" quat="0.707107 0 0.707107 0" rgba="0.95 0.95 0.95 1" material="BeigeMaterial" />	 -->
+        	
+    <body name="base_link" pos="0 0 0">
+			<inertial pos="-0.000648 -0.000166 0.084487" mass="1.697353" fullinertia="0.004622 0.004495 0.002079 9E-06 6E-05 9E-06"/>
+			<geom type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="base_link"/>
+
+		  <body name="shoulder_link" pos="6.1995e-05 0 0.15643" quat="-3.67321e-06 -1 0 0">
+        <inertial pos="-2.3e-05 -0.010364 -0.07336" quat="0.707051 0.0451246 -0.0453544 0.704263" mass="1.37735" fullinertia="0.00457 0.004831 0.001409 -1E-06 -2E-06 -0.000448"/>
+        <joint name="joint_1" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
+        <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="shoulder_link"/>
+
+        <body name="half_arm_1_link" pos="0 0.005375 -0.12838" quat="0.707105 0.707108 0 0">
+          <inertial pos="-4.4e-05 -0.09958 -0.013278" quat="0.482348 0.516286 -0.516862 0.483366" mass="1.16367" diaginertia="0.0113017 0.011088 0.00102532"/>
+          <joint name="joint_2" pos="0 0 0" axis="0 0 1" limited="true" range="-2.2 2.2" frictionloss="1" damping="1"/>
+          <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="half_arm_1_link"/>
+
+          <body name="half_arm_2_link" pos="0 -0.21038 -0.006375" quat="0.707105 -0.707108 0 0">
+            <inertial pos="-4.4e-05 -0.006641 -0.117892" quat="0.706144 0.0213722 -0.0209128 0.707437" mass="1.16366" diaginertia="0.0111633 0.010932 0.00100671"/>
+            <joint name="joint_3" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
+            <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="half_arm_2_link"/>
+
+            <body name="forearm_link" pos="0 0.006375 -0.21038" quat="0.707105 0.707108 0 0">
+              <inertial pos="-1.8e-05 -0.075478 -0.015006" quat="0.483678 0.515961 -0.515859 0.483455" mass="0.930287" diaginertia="0.00834839 0.008147 0.000598606"/>
+              <joint name="joint_4" pos="0 0 0" axis="0 0 1" limited="true" range="-2.5656 2.5656" frictionloss="1" damping="1"/>
+              <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="forearm_link"/>
+
+              <body name="spherical_wrist_1_link" pos="0 -0.20843 -0.006375" quat="0.707105 -0.707108 0 0">
+                <inertial pos="1e-06 -0.009432 -0.063883" quat="0.703558 0.0707492 -0.0707492 0.703558" mass="0.678106" diaginertia="0.00165901 0.001596 0.000346988"/>
+                <joint name="joint_5" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
+                <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="spherical_wrist_1_link"/>
+
+                <body name="spherical_wrist_2_link" pos="0 0.00017505 -0.10593" quat="0.707105 0.707108 0 0">
+                  <inertial pos="1e-06 -0.045483 -0.00965" quat="0.44426 0.550121 -0.550121 0.44426" mass="0.678106" diaginertia="0.00170087 0.001641 0.00035013"/>
+                  <joint name="joint_6" pos="0 0 0" axis="0 0 1" limited="true" range="-2.05 2.05" frictionloss="1" damping="1"/>
+                  <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="spherical_wrist_2_link"/>
+
+                  <body name="bracelet_with_vision_link" pos="0 -0.10593 -0.00017505" quat="0.707105 -0.707108 0 0">
+                    <inertial pos="-0.000281 -0.011402 -0.03108" quat="0.592556 0.413116 -0.393675 0.568536" mass="0.500657" diaginertia="0.000650457 0.00056985 0.000310694"/>
+                    <joint name="joint_7" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
+                    <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="bracelet_with_vision_link"/>
+
+                    <body name="ReamerAssemblyCombine" pos="-0.04 0.04 -0.0615250000000001" euler="3.14159265358979 0 0">
+                      <inertial pos="-9.3E-05 0.000132 -0.022905" quat="0.592556 0.413116 -0.393675 0.568536" mass="1.100" fullinertia="0.000214 0.000223 0.00024 0 1E-06 -2E-06"/>
+                      <geom type="mesh" mesh="ReamerAssemblyCombine"/>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+		  </body>
+    </body>
+		<light directional="false" cutoff="90" exponent="1" diffuse="1 1 1" specular="0 0 0" pos="1 0 1.5" dir="-1 0 -2.5"/>
+	</worldbody>
+</mujoco>
+<!-- <robot name="gen3_arm">
+  <link name="base_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.000648 -0.000166 0.084487"/>
+      <mass value="1.697"/>
+      <inertia ixx="0.004622" ixy="9E-06" ixz="6E-05" iyy="0.004495" iyz="9E-06" izz="0.002079"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/base_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/base_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="shoulder_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-2.3E-05 -0.010364 -0.07336"/>
+      <mass value="1.3773"/>
+      <inertia ixx="0.00457" ixy="1E-06" ixz="2E-06" iyy="0.004831" iyz="0.000448" izz="0.001409"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/shoulder_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/shoulder_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_1" type="continuous">
+    <origin rpy="3.1416 2.7629E-18 -4.9305E-36" xyz="0 0 0.15643"/>
+    <parent link="base_link"/>
+    <child link="shoulder_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" velocity="1.3963"/>
+  </joint>
+  <link name="half_arm_1_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-4.4E-05 -0.09958 -0.013278"/>
+      <mass value="1.1636"/>
+      <inertia ixx="0.011088" ixy="5E-06" ixz="0" iyy="0.001072" iyz="-0.000691" izz="0.011255"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/half_arm_1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/half_arm_1_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_2" type="revolute">
+    <origin rpy="1.5708 2.1343E-17 -1.1102E-16" xyz="0 0.005375 -0.12838"/>
+    <parent link="shoulder_link"/>
+    <child link="half_arm_1_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" lower="-2.41" upper="2.41" velocity="1.3963"/>
+  </joint>
+  <link name="half_arm_2_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-4.4E-05 -0.006641 -0.117892"/>
+      <mass value="1.1636"/>
+      <inertia ixx="0.010932" ixy="0" ixz="-7E-06" iyy="0.011127" iyz="0.000606" izz="0.001043"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/half_arm_2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/half_arm_2_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_3" type="continuous">
+    <origin rpy="-1.5708 1.2326E-32 -2.9122E-16" xyz="0 -0.21038 -0.006375"/>
+    <parent link="half_arm_1_link"/>
+    <child link="half_arm_2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" velocity="1.3963"/>
+  </joint>
+  <link name="forearm_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-1.8E-05 -0.075478 -0.015006"/>
+      <mass value="0.9302"/>
+      <inertia ixx="0.008147" ixy="-1E-06" ixz="0" iyy="0.000631" iyz="-0.0005" izz="0.008316"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/forearm_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/forearm_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_4" type="revolute">
+    <origin rpy="1.5708 -6.6954E-17 -1.6653E-16" xyz="0 0.006375 -0.21038"/>
+    <parent link="half_arm_2_link"/>
+    <child link="forearm_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" lower="-2.66" upper="2.66" velocity="1.3963"/>
+  </joint>
+  <link name="spherical_wrist_1_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="1E-06 -0.009432 -0.063883"/>
+      <mass value="0.6781"/>
+      <inertia ixx="0.001596" ixy="0" ixz="0" iyy="0.001607" iyz="0.000256" izz="0.000399"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/spherical_wrist_1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/spherical_wrist_1_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_5" type="continuous">
+    <origin rpy="-1.5708 2.2204E-16 -6.373E-17" xyz="0 -0.20843 -0.006375"/>
+    <parent link="forearm_link"/>
+    <child link="spherical_wrist_1_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="9" velocity="1.2218"/>
+  </joint>
+  <link name="spherical_wrist_2_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="1E-06 -0.045483 -0.00965"/>
+      <mass value="0.6781"/>
+      <inertia ixx="0.001641" ixy="0" ixz="0" iyy="0.00041" iyz="-0.000278" izz="0.001641"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/spherical_wrist_2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/spherical_wrist_2_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_6" type="revolute">
+    <origin rpy="1.5708 9.2076E-28 -8.2157E-15" xyz="0 0.00017505 -0.10593"/>
+    <parent link="spherical_wrist_1_link"/>
+    <child link="spherical_wrist_2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="9" lower="-2.23" upper="2.23" velocity="1.2218"/>
+  </joint>
+  <link name="bracelet_with_vision_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.000281 0.011402 -0.029798"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.000587" ixy="3E-06" ixz="3E-06" iyy="0.000369" iyz="-0.000118" izz="0.000609"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/bracelet_with_vision_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/bracelet_with_vision_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_7" type="continuous">
+    <origin rpy="-1.5708 -5.5511E-17 9.6396E-17" xyz="0 -0.10593 -0.00017505"/>
+    <parent link="spherical_wrist_2_link"/>
+    <child link="bracelet_with_vision_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="9" velocity="1.2218"/>
+  </joint>
+  <link name="ee_adapter_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-9.3E-05 0.000132 -0.022905"/>
+      <mass value="1.100"/>
+      <inertia ixx="0.000214" ixy="0" ixz="1E-06" iyy="0.000223" iyz="-2E-06" izz="0.00024"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.04 -0.04 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/ReamerAssemblyCombine.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.04 -0.04 0"/>
+      <geometry>
+        <mesh filename="package://descriptions/ReamerAssemblyCombine.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="ee_joint" type="fixed">
+    <origin rpy="3.14159265358979 1.09937075168372E-32 0" xyz="0 0 -0.0615250000000001"/>
+    <parent link="bracelet_with_vision_link"/>
+    <child link="ee_adapter_link"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+  <link name="end_effector_link"/>
+  <joint name="end_effector" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.29990848"/>
+    <parent link="ee_adapter_link"/>
+    <child link="end_effector_link"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+</robot>
+ -->
