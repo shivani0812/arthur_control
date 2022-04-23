@@ -19,6 +19,7 @@
     <mesh name="spherical_wrist_2_link" file="spherical_wrist_2_link.STL" />
     <mesh name="bracelet_with_vision_link" file="bracelet_with_vision_link.STL" />
     <mesh name="ReamerAssemblyCombine" file="ReamerAssemblyCombine_xml.stl" />
+    <mesh name = "pelvis" file="pelvis.stl" scale = "0.001 0.001 0.001"/>
     <material name="BeigeMaterial" specular="0" shininess="0" reflectance="0" rgba="0.26 0.16 0.16796875 1" emission="0" />
   </asset>
 
@@ -36,7 +37,10 @@
  		<geom name="floor" pos="0 0 0" size="10 10 1" type="plane" rgba="1 0.83 0.61 1" material="BeigeMaterial" />
         <!-- <geom name="wall_1" pos="0 -2.5 1" size="2.5 2.5 1" type="plane" quat="0.707107 -0.707107 0 0" rgba="0.95 0.95 0.95 1" material="BeigeMaterial" /> -->
         <!-- <geom name="wall_2" pos="-2.5 0 1" size="2.5 2.5 1" type="plane" quat="0.707107 0 0.707107 0" rgba="0.95 0.95 0.95 1" material="BeigeMaterial" />	 -->
-        	
+    <body name = "pelvis" euler = "-1.6 0 1.6" pos = "-0.5 1 0" >
+        <!-- <joint type = "free" /> -->
+        <geom type = "mesh" rgba = "1 1 1 1" mesh = "pelvis"/>
+    </body>   	
     <body name="base_link" pos="0 0 0">
 			<inertial pos="-0.000648 -0.000166 0.084487" mass="1.697353" fullinertia="0.004622 0.004495 0.002079 9E-06 6E-05 9E-06"/>
 			<geom type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="base_link"/>

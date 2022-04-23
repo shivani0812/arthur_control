@@ -10,9 +10,9 @@ using Parameters
 using Rotations
 using LinearAlgebra
 using ForwardDiff
-using mujoco_sim
+# using mujoco_sim
 
-activate_mujoco(joinpath(@__DIR__, "../mjkey.txt"))
+# activate_mujoco(joinpath(@__DIR__, "../mjkey.txt"))
 
 # export
 #     Arthur,
