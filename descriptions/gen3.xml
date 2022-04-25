@@ -34,7 +34,7 @@
   </actuator>
 
   <sensor>
-    <!-- <jointpos name="joint_1_pos" joint="joint_1"/>
+    <jointpos name="joint_1_pos" joint="joint_1"/>
     <jointpos name="joint_2_pos" joint="joint_2"/>
     <jointpos name="joint_3_pos" joint="joint_3"/>
     <jointpos name="joint_4_pos" joint="joint_4"/>
@@ -47,7 +47,7 @@
     <jointvel name="joint_4_vel" joint="joint_4"/>
     <jointvel name="joint_5_vel" joint="joint_5"/>
     <jointvel name="joint_6_vel" joint="joint_6"/>
-    <jointvel name="joint_7_vel" joint="joint_7"/> -->
+    <jointvel name="joint_7_vel" joint="joint_7"/>
     <force name="ee_force" site="force_sensor" />
   </sensor>
 
@@ -60,11 +60,11 @@
         <geom type = "mesh" rgba = "1 1 1 1" mesh = "pelvis"/>
     </body>   	
     <body name="base_link" pos="0 0 0">
-			<inertial pos="-0.000648 -0.000166 0.084487" mass="1.697353" fullinertia="0.004622 0.004495 0.002079 9E-06 6E-05 9E-06"/>
+			<inertial pos="-0.000648 -0.000166 0.084487" mass="1.697" fullinertia="0.004622 0.004495 0.002079 9E-06 6E-05 9E-06"/>
 			<geom type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="base_link"/>
 
 		  <body name="shoulder_link" pos="6.1995e-05 0 0.15643" quat="-3.67321e-06 -1 0 0">
-        <inertial pos="-2.3e-05 -0.010364 -0.07336" quat="0.707051 0.0451246 -0.0453544 0.704263" mass="1.37735" fullinertia="0.00457 0.004831 0.001409 -1E-06 -2E-06 -0.000448"/>
+        <inertial pos="-2.3e-05 -0.010364 -0.07336" quat="0.707051 0.0451246 -0.0453544 0.704263" mass="1.3773" fullinertia="0.00457 0.004831 0.001409 -1E-06 -2E-06 -0.000448"/>
         <joint name="joint_1" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
         <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="shoulder_link"/>
 
