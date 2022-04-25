@@ -48,7 +48,7 @@
     <jointvel name="joint_5_vel" joint="joint_5"/>
     <jointvel name="joint_6_vel" joint="joint_6"/>
     <jointvel name="joint_7_vel" joint="joint_7"/> -->
-    <!-- <force name="ee_force" site="force_sensor" /> -->
+    <force name="ee_force" site="force_sensor" />
   </sensor>
 
   <worldbody>
@@ -98,12 +98,13 @@
                     <joint name="joint_7" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
                     <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="bracelet_with_vision_link"/>
 
-                    <body name="ReamerAssemblyCombine" pos="0 0 0" euler="3.14159265358979 0 0">
+                    <body name="ReamerAssemblyCombine" pos="0 0 -0.0619" euler="3.14159265358979 0 0">
                       <inertial pos="-9.3E-05 0.000132 -0.022905" quat="0.592556 0.413116 -0.393675 0.568536" mass="1.100" fullinertia="0.000214 0.000223 0.00024 0 1E-06 -2E-06"/>
                       <geom type="mesh" mesh="ReamerAssemblyCombine"/>
-                      <!-- <site name='force_sensor' type='sphere' pos='0.045 0.04 0.29990848'
-                        size='0.028 0.028 0.028' rgba='0.7 0.7 0 1' /> -->
-                        <!-- -0.04 0.04 -0.0615250000000001 -->
+                      <site name='force_sensor' type='sphere' pos='0 0 0.29990848'
+                        size='0.028 0.028 0.028' rgba='0.7 0.7 0 0' />
+                        <!-- 0.29990848 -->
+                        <!-- 0.32790848 -->
                     </body>
                   </body>
                 </body>
