@@ -38,7 +38,7 @@ function RobotDynamics.dynamics(model::Arthur, x::AbstractVector{T1}, u::Abstrac
     # p = x[2*num_q + 1:2*num_q + 6]
     # ṗ = x[2*num_q + 7:2*num_q + 12]
     # F = x[2*num_q + 13:2*num_q + 18]
-    F = [0,0,0,0,0,4e-1]
+    F = [0,0,0,0,0,1e-1]
     # Be = zeros(T, 6, 6)
     
     # if (norm(ṗ) > 1e-5)
