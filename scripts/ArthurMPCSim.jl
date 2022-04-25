@@ -3,6 +3,7 @@ include("MPC.jl");
 m = mujoco_sim.get_model(joinpath(@__DIR__, "../descriptions/gen3.xml"))
 
 function ctrler!(s) 
+    println(s.d.sensordata)
     u = zeros(7)
     setaction!(s, u)
 end

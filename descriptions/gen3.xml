@@ -33,6 +33,24 @@
     <motor name="bracelet_with_vision_link_motor" joint="joint_7" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="-9 9" forcerange="-9 9"/>
   </actuator>
 
+  <sensor>
+    <!-- <jointpos name="joint_1_pos" joint="joint_1"/>
+    <jointpos name="joint_2_pos" joint="joint_2"/>
+    <jointpos name="joint_3_pos" joint="joint_3"/>
+    <jointpos name="joint_4_pos" joint="joint_4"/>
+    <jointpos name="joint_5_pos" joint="joint_5"/>
+    <jointpos name="joint_6_pos" joint="joint_6"/>
+    <jointpos name="joint_7_pos" joint="joint_7"/>
+    <jointvel name="joint_1_vel" joint="joint_1"/>
+    <jointvel name="joint_2_vel" joint="joint_2"/>
+    <jointvel name="joint_3_vel" joint="joint_3"/>
+    <jointvel name="joint_4_vel" joint="joint_4"/>
+    <jointvel name="joint_5_vel" joint="joint_5"/>
+    <jointvel name="joint_6_vel" joint="joint_6"/>
+    <jointvel name="joint_7_vel" joint="joint_7"/> -->
+    <!-- <force name="ee_force" site="force_sensor" /> -->
+  </sensor>
+
   <worldbody>
  		<geom name="floor" pos="0 0 0" size="10 10 1" type="plane" rgba="1 0.83 0.61 1" material="BeigeMaterial" />
         <!-- <geom name="wall_1" pos="0 -2.5 1" size="2.5 2.5 1" type="plane" quat="0.707107 -0.707107 0 0" rgba="0.95 0.95 0.95 1" material="BeigeMaterial" /> -->
@@ -80,9 +98,12 @@
                     <joint name="joint_7" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
                     <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="bracelet_with_vision_link"/>
 
-                    <body name="ReamerAssemblyCombine" pos="-0.04 0.04 -0.0615250000000001" euler="3.14159265358979 0 0">
+                    <body name="ReamerAssemblyCombine" pos="0 0 0" euler="3.14159265358979 0 0">
                       <inertial pos="-9.3E-05 0.000132 -0.022905" quat="0.592556 0.413116 -0.393675 0.568536" mass="1.100" fullinertia="0.000214 0.000223 0.00024 0 1E-06 -2E-06"/>
                       <geom type="mesh" mesh="ReamerAssemblyCombine"/>
+                      <!-- <site name='force_sensor' type='sphere' pos='0.045 0.04 0.29990848'
+                        size='0.028 0.028 0.028' rgba='0.7 0.7 0 1' /> -->
+                        <!-- -0.04 0.04 -0.0615250000000001 -->
                     </body>
                   </body>
                 </body>
