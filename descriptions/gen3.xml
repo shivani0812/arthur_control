@@ -34,7 +34,7 @@
   </actuator>
 
   <sensor>
-    <!-- <jointpos name="joint_1_pos" joint="joint_1"/>
+    <jointpos name="joint_1_pos" joint="joint_1"/>
     <jointpos name="joint_2_pos" joint="joint_2"/>
     <jointpos name="joint_3_pos" joint="joint_3"/>
     <jointpos name="joint_4_pos" joint="joint_4"/>
@@ -47,7 +47,7 @@
     <jointvel name="joint_4_vel" joint="joint_4"/>
     <jointvel name="joint_5_vel" joint="joint_5"/>
     <jointvel name="joint_6_vel" joint="joint_6"/>
-    <jointvel name="joint_7_vel" joint="joint_7"/> -->
+    <jointvel name="joint_7_vel" joint="joint_7"/>
     <force name="ee_force" site="force_sensor" />
   </sensor>
 
@@ -60,41 +60,41 @@
         <geom type = "mesh" rgba = "1 1 1 1" mesh = "pelvis"/>
     </body>   	
     <body name="base_link" pos="0 0 0">
-			<inertial pos="-0.000648 -0.000166 0.084487" mass="1.697353" fullinertia="0.004622 0.004495 0.002079 9E-06 6E-05 9E-06"/>
+			<inertial pos="-0.000648 -0.000166 0.084487" mass="1.697" fullinertia="0.004622 0.004495 0.002079 9E-06 6E-05 9E-06"/>
 			<geom type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="base_link"/>
 
 		  <body name="shoulder_link" pos="6.1995e-05 0 0.15643" quat="-3.67321e-06 -1 0 0">
-        <inertial pos="-2.3e-05 -0.010364 -0.07336" quat="0.707051 0.0451246 -0.0453544 0.704263" mass="1.37735" fullinertia="0.00457 0.004831 0.001409 -1E-06 -2E-06 -0.000448"/>
+        <inertial pos="-2.3e-05 -0.010364 -0.07336" quat="0.707051 0.0451246 -0.0453544 0.704263" mass="1.3773" fullinertia="0.00457 0.004831 0.001409 -1E-06 -2E-06 -0.000448"/>
         <joint name="joint_1" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
         <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="shoulder_link"/>
 
         <body name="half_arm_1_link" pos="0 0.005375 -0.12838" quat="0.707105 0.707108 0 0">
-          <inertial pos="-4.4e-05 -0.09958 -0.013278" quat="0.482348 0.516286 -0.516862 0.483366" mass="1.16367" diaginertia="0.0113017 0.011088 0.00102532"/>
+          <inertial pos="-4.4e-05 -0.09958 -0.013278" quat="0.482348 0.516286 -0.516862 0.483366" mass="1.1636" fullinertia="0.01108 0.001072 0.011255 5E-06 0 -0.000691"/>
           <joint name="joint_2" pos="0 0 0" axis="0 0 1" limited="true" range="-2.2 2.2" frictionloss="1" damping="1"/>
           <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="half_arm_1_link"/>
 
           <body name="half_arm_2_link" pos="0 -0.21038 -0.006375" quat="0.707105 -0.707108 0 0">
-            <inertial pos="-4.4e-05 -0.006641 -0.117892" quat="0.706144 0.0213722 -0.0209128 0.707437" mass="1.16366" diaginertia="0.0111633 0.010932 0.00100671"/>
+            <inertial pos="-4.4e-05 -0.006641 -0.117892" quat="0.706144 0.0213722 -0.0209128 0.707437" mass="1.1636" fullinertia="0.010932 0.011127 0.001043 0 -7E-06 0.000606"/>
             <joint name="joint_3" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
             <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="half_arm_2_link"/>
 
             <body name="forearm_link" pos="0 0.006375 -0.21038" quat="0.707105 0.707108 0 0">
-              <inertial pos="-1.8e-05 -0.075478 -0.015006" quat="0.483678 0.515961 -0.515859 0.483455" mass="0.930287" diaginertia="0.00834839 0.008147 0.000598606"/>
+              <inertial pos="-1.8e-05 -0.075478 -0.015006" quat="0.483678 0.515961 -0.515859 0.483455" mass="0.9302" fullinertia="0.008147 0.000631 0.008316 -1E-06 0 -0.0005"/>
               <joint name="joint_4" pos="0 0 0" axis="0 0 1" limited="true" range="-2.5656 2.5656" frictionloss="1" damping="1"/>
               <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="forearm_link"/>
 
               <body name="spherical_wrist_1_link" pos="0 -0.20843 -0.006375" quat="0.707105 -0.707108 0 0">
-                <inertial pos="1e-06 -0.009432 -0.063883" quat="0.703558 0.0707492 -0.0707492 0.703558" mass="0.678106" diaginertia="0.00165901 0.001596 0.000346988"/>
+                <inertial pos="1e-06 -0.009432 -0.063883" quat="0.703558 0.0707492 -0.0707492 0.703558" mass="0.6781" fullinertia="0.001596 0.001607 0.000399 0 0 0.000256"/>
                 <joint name="joint_5" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
                 <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="spherical_wrist_1_link"/>
 
                 <body name="spherical_wrist_2_link" pos="0 0.00017505 -0.10593" quat="0.707105 0.707108 0 0">
-                  <inertial pos="1e-06 -0.045483 -0.00965" quat="0.44426 0.550121 -0.550121 0.44426" mass="0.678106" diaginertia="0.00170087 0.001641 0.00035013"/>
+                  <inertial pos="1e-06 -0.045483 -0.00965" quat="0.44426 0.550121 -0.550121 0.44426" mass="0.6781" fullinertia="0.001641 0.00041 0.001641 0 0 -0.000278"/>
                   <joint name="joint_6" pos="0 0 0" axis="0 0 1" limited="true" range="-2.05 2.05" frictionloss="1" damping="1"/>
                   <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="spherical_wrist_2_link"/>
 
                   <body name="bracelet_with_vision_link" pos="0 -0.10593 -0.00017505" quat="0.707105 -0.707108 0 0">
-                    <inertial pos="-0.000281 -0.011402 -0.03108" quat="0.592556 0.413116 -0.393675 0.568536" mass="0.500657" diaginertia="0.000650457 0.00056985 0.000310694"/>
+                    <inertial pos="0.000281 0.011402 -0.029798" quat="0.592556 0.413116 -0.393675 0.568536" mass="0.5" fullinertia="0.000587 0.000369 0.000609 3E-06 3E-06 -0.000118"/>
                     <joint name="joint_7" pos="0 0 0" axis="0 0 1" frictionloss="1" damping="1"/>
                     <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="bracelet_with_vision_link"/>
 
@@ -103,8 +103,6 @@
                       <geom type="mesh" mesh="ReamerAssemblyCombine"/>
                       <site name='force_sensor' type='sphere' pos='0 0 0.29990848'
                         size='0.028 0.028 0.028' rgba='0.7 0.7 0 0' />
-                        <!-- 0.29990848 -->
-                        <!-- 0.32790848 -->
                     </body>
                   </body>
                 </body>
