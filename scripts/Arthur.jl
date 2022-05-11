@@ -38,7 +38,6 @@ function RobotDynamics.dynamics(model::Arthur, x::AbstractVector{T1}, u::Abstrac
     # p = x[2*num_q + 1:2*num_q + 6]
     # ṗ = x[2*num_q + 7:2*num_q + 12]
     # F = x[2*num_q + 13:2*num_q + 18]
-    F = [0,0,0,0,0,1e-1]
     # Be = zeros(T, 6, 6)
     
     # if (norm(ṗ) > 1e-5)
@@ -52,13 +51,12 @@ function RobotDynamics.dynamics(model::Arthur, x::AbstractVector{T1}, u::Abstrac
     # copyto!(parent(state.v), 1, x, num_positions(state) + 1, num_velocities(state))
     # setdirty!(state)
     copyto!(state, x[SA[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]])
-    rootframe = root_frame(model.mechanism)
-    w = Wrench{T}(default_frame(bodies(model.mechanism)[end-1]), F[4:6], F[1:3])
-    wrenches = BodyDict{Wrench{T}}(BodyID(b) => zero(Wrench{T}, rootframe) for b in bodies(model.mechanism))
-    wrenches[bodies(model.mechanism)[end-1].id] = transform(w, transform_to_root(state, bodies(model.mechanism)[end-1]))      
-    # dynamics!(dynamicsResult, mechanismState, u, wrenches)
-    dynamics!(res, state, u, wrenches)
-    # dynamics!(res, state, u)
+    # rootframe = root_frame(model.mechanism)
+    # w = Wrench{T}(default_frame(bodies(model.mechanism)[end-1]), F[4:6], F[1:3])
+    # wrenches = BodyDict{Wrench{T}}(BodyID(b) => zero(Wrench{T}, rootframe) for b in bodies(model.mechanism))
+    # wrenches[bodies(model.mechanism)[end-1].id] = transform(w, transform_to_root(state, bodies(model.mechanism)[end-1]))      
+    # dynamics!(res, state, u, wrenches)
+    dynamics!(res, state, u)
 
     # p̈ = [res.accelerations[bodies(model.mechanism)[end].id].linear; res.accelerations[bodies(model.mechanism)[end].id].angular]
     # Ḟ = Be*p̈

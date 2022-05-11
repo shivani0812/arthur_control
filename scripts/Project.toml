@@ -1,6 +1,9 @@
 [deps]
 Altro = "5dcf52e5-e2fb-48e0-b826-96f46d2e3e73"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
+Measures = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 RigidBodyDynamics = "366cf18f-59d5-5db9-a4de-86a9f6786172"
 RobotDynamics = "38ceca67-d8d3-44e8-9852-78a5596522e1"

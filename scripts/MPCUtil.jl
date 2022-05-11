@@ -97,7 +97,16 @@
 #     Altro.shift_fill!(TrajectoryOptimization.get_constraints(altro.solver_al), 0)
 # end
 
-function ArthurProblem(Xref; params=MPC_Params())
+function getJ(model::Arthur, x::AbstractVector{T}) where T
+    state = model.statecache[T]
+    set_configuration!(state, x[SA[1, 2, 3, 4, 5, 6, 7]])
+    J = geometric_jacobian(state, path(model.mechanism, root_body(model.mechanism), bodies(model.mechanism)[end]))
+    # ẋ = 1000 * J.linear*x[SA[8, 9, 10, 11, 12, 13, 14]]
+    # return ẋ'ẋ
+    return J.linear
+end
+
+function ArthurProblem(Xref, direction; params=MPC_Params())
     # Create initial guess of U trajectory
     Qref = Vector{Float64}[]
     Uref = Vector{Float64}[]
@@ -145,215 +154,68 @@ function ArthurProblem(Xref; params=MPC_Params())
     # F_bnd = NormConstraint(n, m, F_max, Inequality(), 27:29)
     # add_constraint!(conSet, F_bnd, 1:N)
 
+    B = 300000*Diagonal(ones(3))
+    F_lim = 300 * direction
+    neg_rows = []
+    for i in 1:3
+        if F_lim[i] < 0
+            push!(neg_rows, i)
+            F_lim[i] = F_lim[i] * -1
+        end
+    end
+    print("Force Check ")
+    println(F_lim)
+    for k in 1:length(Xref)-1
+        J = getJ(params.model, Xref[k])
+        for neg_row in neg_rows
+            J[neg_row,:] = J[neg_row,:] * -1
+        end
+        A_force = B * J
+        print(k)
+        print(" ")
+        println(A_force*Xref[k][8:14])
+        F_con = LinearConstraint(n,m,A_force,F_lim,Inequality(),8:14)
+        add_constraint!(conSet,F_con,k)
+    end
+
     dtref = [params.dt for k=1:N]
     traj = RobotDynamics.Traj(Xref, Uref, dtref, cumsum(dtref) .- dtref[1])
     obj = TrajectoryOptimization.TrackingObjective(params.Q, params.R, traj, Qf=params.Qf)
-    prob = Problem(params.model, obj, Xref[end], tf, x0=Xref[1], constraints=conSet, X0=Qref, U0=Uref, integration=RK3)
+    prob = Problem(params.model, obj, Xref[end], tf, x0=Xref[1], constraints=conSet, X0=Qref, U0=Uref, integration=RK4)
     return prob
 end
 
-# function ArthurHorizonProblem(prob::TrajectoryOptimization.Problem, x0, N; start=1, params=MPC_Params())
-#     # H = N
-#     while (start+N-1) > length(prob.Z)
-#         N -= 1
-#     end
-
-#     n,m = size(prob)
-#     dt = prob.Z[1].dt
-#     tf = (N-1)*dt
-#     # Get sub-trajectory
-#     if N > 1  
-#     # if N == H
-#         Z = Traj(prob.Z[start:start+N-1])
-#     # else
-#         # Z = Traj([prob.Z[start:start+N-1]; [prob.Z[end] for k = 1:(H-N+1)]])
-#     # end
-
-#     # Generate a cost that tracks the trajectory
-#         obj = TrajectoryOptimization.TrackingObjective(params.Q, params.R, Z, Qf=params.Qf)
-
-#     # Use the same constraints, except the Goal constraint
-#         cons = ConstraintList(n,m,N)
-#         for (inds, con) in zip(prob.constraints)
-#             if !(con isa GoalConstraint)
-#                 if inds.stop > N
-#                     inds = inds.start:N-(prob.N - inds.stop)
-#                 end
-#                 length(inds) > 0 && TrajectoryOptimization.add_constraint!(cons, con, inds)
-#             end
-#         end
-
-#         prob = TrajectoryOptimization.Problem(prob.model, obj, state(Z[end]), tf, x0=x0, constraints=cons,
-#             integration=TrajectoryOptimization.integration(prob)
-#         )
-#         initial_trajectory!(prob, Z)
-#     else
-#         obj = TrajectoryOptimization.LQRObjective(params.Q, params.R, params.Qf, state(prob.Z[end]), params.LQRH)
-#          # # Gather trajectory information
-#         # Create Empty ConstraintList
-#         cons = ConstraintList(params.n,params.m,params.LQRH)
-
-#         # Control Bounds based on Robot Specs (Joint torque limits)
-#         u_bnd = [39.0, 39.0, 39.0, 39.0, 9.0, 9.0, 9.0]
-#         control_bnd = BoundConstraint(params.n,params.m, u_min=-u_bnd, u_max=u_bnd)
-#         add_constraint!(cons, control_bnd, 1:params.LQRH-1)
-
-#         # State Bounds based on Robot Specs (Joint velocity and speed limits)
-#         x_bnd = zeros(params.n)
-#         x_bnd[1:7] = [Inf, deg2rad(128.9), Inf, deg2rad(147.8), Inf, deg2rad(120.3), Inf] # rad
-#         x_bnd[8:14] = [1.39, 1.39, 1.39, 1.39, 1.22, 1.22, 1.22] # rad/sec
-#         # x_bnd[8:14] = [0.25, 0.05, 0.05, 0.05, 0.25, 0.15, 0.15] # rad/sec
-#         # x_bnd[15:end] = [Inf for k=1:(n-14)] # Constraints on force elsewhere
-#         state_bnd = BoundConstraint(params.n,params.m, x_min=-x_bnd, x_max=x_bnd)
-#         add_constraint!(cons, state_bnd, 1:params.LQRH-1)
-
-#         # # # Cartesian Velocity Bound
-#         # # ẋ_max = 0.0005 # m/s
-#         # # vel_bnd = NormConstraint(n, m, ẋ_max, Inequality(), 21:23)
-#         # # add_constraint!(cons, vel_bnd, 1:N)
-
-#         # # # Force Bound (Fx Fy Fz)
-#         # # F_max = 20 # Newtons
-#         # # F_bnd = NormConstraint(n, m, F_max, Inequality(), 27:29)
-#         # # add_constraint!(cons, F_bnd, 1:N)
-#         Z = Traj([prob.Z[end] for k = 1:params.LQRH])
-#         tf = params.LQRH*dt
-#         prob = TrajectoryOptimization.Problem(prob.model, obj, state(prob.Z[end]), tf, x0=x0, constraints=cons,
-#             integration=TrajectoryOptimization.integration(prob)
-#         )
-#         initial_trajectory!(prob, Z)
-#     end
-    
-#     return prob
-# end
-
-# function ArthurHorizonProblem(prob::TrajectoryOptimization.Problem, x0, N; start=1, params=MPC_Params())
-#     # H = N
-#     # while (start+N-1) > length(prob.Z)
-#     #     N -= 1
-#     # end
-
-#     n,m = size(prob)
-#     dt = prob.Z[1].dt
-#     tf = params.LQRH*dt
-#     # tf = (N-1)*dt
-#     if start >= length(prob.Z)
-#         N = length(prob.Z)
-#     else
-#         N = start + 1
-#     end
-    
-#     x_current = zeros(n)
-#     x_current[1:7] = x0[1:7]
-#     xf = zeros(n)
-#     xf[1:7] .= state(prob.Z[N])[1:7]
-
-#     obj = TrajectoryOptimization.LQRObjective(params.Q, params.R, params.Qf, xf, params.LQRH)
-
-#     # Create Empty ConstraintList
-#     cons = ConstraintList(params.n,params.m,params.LQRH)
-
-#     # Control Bounds based on Robot Specs (Joint torque limits)
-#     u_bnd = [39.0, 39.0, 39.0, 39.0, 9.0, 9.0, 9.0]
-#     control_bnd = BoundConstraint(params.n,params.m, u_min=-u_bnd, u_max=u_bnd)
-#     add_constraint!(cons, control_bnd, 1:params.LQRH-1)
-
-#     # State Bounds based on Robot Specs (Joint velocity and speed limits)
-#     x_bnd = zeros(params.n)
-#     x_bnd[1:7] = [Inf, deg2rad(128.9), Inf, deg2rad(147.8), Inf, deg2rad(120.3), Inf] # rad
-#     x_bnd[8:14] = [1.39, 1.39, 1.39, 1.39, 1.22, 1.22, 1.22] # rad/sec
-#     # x_bnd[15:end] = [Inf for k=1:(n-14)] # Constraints on force elsewhere
-#     state_bnd = BoundConstraint(params.n,params.m, x_min=-x_bnd, x_max=x_bnd)
-#     add_constraint!(cons, state_bnd, 1:params.LQRH-1)
-
-#     # # # Cartesian Velocity Bound
-#     # # ẋ_max = 0.0005 # m/s
-#     # # vel_bnd = NormConstraint(n, m, ẋ_max, Inequality(), 21:23)
-#     # # add_constraint!(cons, vel_bnd, 1:N)
-
-#     # # # Force Bound (Fx Fy Fz)
-#     # # F_max = 20 # Newtons
-#     # # F_bnd = NormConstraint(n, m, F_max, Inequality(), 27:29)
-#     # # add_constraint!(cons, F_bnd, 1:N)
-    
-#     Qref = [x_current for k=1:params.LQRH]
-#     set_configuration!(params.state, x_current[1:7])
-#     Uref = [inverse_dynamics(params.state, params.v̇) for k=1:params.LQRH-1]
-#     dtref = [params.dt for k=1:params.LQRH]
-#     Z = Traj(Qref, Uref, dtref, cumsum(dtref) .- dtref[1])
-#     # Z = Traj([prob.Z[end] for k = 1:params.LQRH])
-#     tf = params.LQRH*dt
-#     prob = TrajectoryOptimization.Problem(prob.model, obj, xf, tf, x0=x0, constraints=cons,
-#         integration=TrajectoryOptimization.integration(prob)
-#     )
-#     initial_trajectory!(prob, Z)
-    
-#     return prob
-# end
-
-function ArthurHorizonProblem(Xref, x0, N; start=1, params=MPC_Params())
-    # H = N
-    # while (start+N-1) > length(prob.Z)
-    #     N -= 1
-    # end
-
-    n = params.n
-    m = params.m
-    dt = params.dt
-    tf = params.LQRH*dt
-    # tf = (N-1)*dt
-    if start >= length(Xref)
-        N = length(Xref)
-    else
-        N = start + 1
+function ArthurHorizonProblem(prob::TrajectoryOptimization.Problem, x0, N; start=1, params=MPC_Params())
+    while (start+N-1) > length(prob.Z)
+        N -= 1
     end
-    
-    x_current = zeros(n)
-    x_current[1:7] = x0[1:7]
-    xf = zeros(n)
-    xf[1:7] .= Xref[N][1:7]
-    # xf[1:7] .= x0[1:7]
 
-    obj = TrajectoryOptimization.LQRObjective(params.Q, params.R, params.Qf, xf, params.LQRH)
+    n,m = size(prob)
+    dt = prob.Z[1].dt
+    tf = (N-1)*dt
 
-    # Create Empty ConstraintList
-    cons = ConstraintList(params.n,params.m,params.LQRH)
+    # Get sub-trajectory
+    Z = Traj(prob.Z[start:start+N-1])
 
-    # Control Bounds based on Robot Specs (Joint torque limits)
-    u_bnd = [39.0, 39.0, 39.0, 39.0, 9.0, 9.0, 9.0]
-    control_bnd = BoundConstraint(params.n,params.m, u_min=-u_bnd, u_max=u_bnd)
-    add_constraint!(cons, control_bnd, 1:params.LQRH-1)
+    # Generate a cost that tracks the trajectory
+    obj = TrajectoryOptimization.TrackingObjective(params.Q, params.R, Z, Qf=params.Qf)
 
-    # State Bounds based on Robot Specs (Joint velocity and speed limits)
-    x_bnd = zeros(params.n)
-    x_bnd[1:7] = [Inf, deg2rad(128.9), Inf, deg2rad(147.8), Inf, deg2rad(120.3), Inf] # rad
-    x_bnd[8:14] = [1.39, 1.39, 1.39, 1.39, 1.22, 1.22, 1.22] # rad/sec
-    # x_bnd[15:end] = [Inf for k=1:(n-14)] # Constraints on force elsewhere
-    state_bnd = BoundConstraint(params.n,params.m, x_min=-x_bnd, x_max=x_bnd)
-    add_constraint!(cons, state_bnd, 1:params.LQRH-1)
+    # Use the same constraints, except the Goal constraint
+    cons = ConstraintList(n,m,N)
+    for (inds, con) in zip(prob.constraints)
+        if !(con isa GoalConstraint)
+            if inds.stop > N
+                inds = inds.start:N-(prob.N - inds.stop)
+            end
+            inds = inds[1:length(inds)-1]
+            length(inds) > 0 && TrajectoryOptimization.add_constraint!(cons, con, inds)
+        end
+    end
 
-    # # # Cartesian Velocity Bound
-    # # ẋ_max = 0.0005 # m/s
-    # # vel_bnd = NormConstraint(n, m, ẋ_max, Inequality(), 21:23)
-    # # add_constraint!(cons, vel_bnd, 1:N)
-
-    # # # Force Bound (Fx Fy Fz)
-    # # F_max = 20 # Newtons
-    # # F_bnd = NormConstraint(n, m, F_max, Inequality(), 27:29)
-    # # add_constraint!(cons, F_bnd, 1:N)
-    
-    Qref = [x_current for k=1:params.LQRH]
-    set_configuration!(params.state, x_current[1:7])
-    Uref = [inverse_dynamics(params.state, params.v̇) for k=1:params.LQRH-1]
-    dtref = [params.dt for k=1:params.LQRH]
-    Z = Traj(Qref, Uref, dtref, cumsum(dtref) .- dtref[1])
-    # Z = Traj([prob.Z[end] for k = 1:params.LQRH])
-    tf = params.LQRH*dt
-    prob = TrajectoryOptimization.Problem(params.model, obj, xf, tf, x0=x0, constraints=cons,
-        integration=RK3
+    prob = TrajectoryOptimization.Problem(prob.model, obj, state(Z[end]), tf, x0=x0, constraints=cons,
+        integration=TrajectoryOptimization.integration(prob)
     )
     initial_trajectory!(prob, Z)
-    
     return prob
 end
 
@@ -362,7 +224,6 @@ struct MPC_Params
     n::Int64
     m::Int64
     H::Int64
-    LQRH::Int64
     tf::Float64
     dt::Float64
     state::MechanismState
@@ -376,10 +237,10 @@ struct MPC_Params
         model = Arthur()
         n,m = size(model)
 
-        tf = 0.25 # Time Horizon (seconds)
-        dt = 0.05 # Time step (seconds)
+        tf = 0.5 # Time Horizon (seconds)
+        dt = 0.1 # Time step (seconds)
         H = Int(round(tf/dt) + 1) # Time Horizon (discrete steps)
-        LQRH = 5
+
         state = MechanismState(model.mechanism)
         zero!(state)
         v̇ = similar(velocity(state))
@@ -397,13 +258,70 @@ struct MPC_Params
             projected_newton=true,
         )
 
-        Q = 100.0*Diagonal(@SVector ones(n))
-        Qf = 1000.0*Diagonal(@SVector ones(n))
+        # Q = 100.0*Diagonal(@SVector ones(n))
+        Q = 2000.0*Diagonal(@SVector [1, 1, 1, 1, 1, 1, 1, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01])
+        Qf = 2000.0*Diagonal(@SVector [1, 1, 1, 1, 1, 1, 1, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01])
         R = 1.0e-1*Diagonal(@SVector ones(m))
-        new(model,n,m,H,LQRH,tf,dt,state,v̇,opts,Q,Qf,R)
+        new(model,n,m,H,tf,dt,state,v̇,opts,Q,Qf,R)
     end
 end
 
+function getẋ(model::Arthur, x::AbstractVector{T}) where T
+    state = model.statecache[T]
+    set_configuration!(state, x[SA[1, 2, 3, 4, 5, 6, 7]])
+    J = geometric_jacobian(state, path(model.mechanism, root_body(model.mechanism), bodies(model.mechanism)[end]))
+    ẋ = J.linear*x[SA[8, 9, 10, 11, 12, 13, 14]]
+    return ẋ
+end
+
+function interpolateTraj(model::Arthur, Xref::Vector{Vector{Float64}}; params=MPC_Params())
+    currentXref = copy(Xref)
+    
+    interpolate = true
+    while interpolate
+        interpolate = false
+        interpolation_loc = [false for k = 1:length(currentXref)]
+        for k = 1:length(currentXref)
+            ẋ = norm(getẋ(model, currentXref[k]))
+            if ẋ > 0.001
+                interpolation_loc[k] = true
+                interpolate = true
+                print(k)
+                print(" ")
+                println(ẋ)
+            end
+        end
+        if interpolate
+            newqref = typeof(zeros(7))[]
+            for k = 1:length(currentXref)-1
+                if interpolation_loc[k+1]
+                    push!(newqref, currentXref[k][1:7])
+                    push!(newqref, currentXref[k][1:7]+((currentXref[k+1][1:7]-currentXref[k][1:7])/2))
+                else
+                    push!(newqref, currentXref[k][1:7])
+                end
+            end
+            push!(newqref, currentXref[length(currentXref)][1:7])
+            push!(newqref, currentXref[length(currentXref)][1:7])
+            newq̇ref = typeof(zeros(7))[]
+            push!(newq̇ref, zeros(7))
+            for k = 1:length(newqref)-1
+                push!(newq̇ref, (newqref[k+1]-newqref[k])/params.dt)
+            end
+            push!(newq̇ref, zeros(7))
+
+            empty!(currentXref)
+            for k = 1:length(newqref)
+                push!(currentXref, [newqref[k]; newq̇ref[k]])
+            end
+            while norm(currentXref[end] - currentXref[end-1]) < 1e-20
+                pop!(currentXref)
+            end
+        end
+    end
+
+    return currentXref
+end
 
 # function initialize_solver(params::MPC_Params)
 #     traj = RobotDynamics.Traj(params.n, params.m, params.dt, params.H)

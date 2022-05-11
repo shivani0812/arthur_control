@@ -1,8 +1,16 @@
-include("MPC.jl");
+include("MPC.jl")
+# using RigidBodyDynamics
+# using StaticArrays
+# using RobotDynamics
+# using Altro
+# using TrajectoryOptimization
 
-m = mujoco_sim.get_model(joinpath(@__DIR__, "../descriptions/gen3.xml"))
-params = MPC_Params();
+# model = Arthur()
+# n,m = size(model)
 
+# tf = 4.1
+# dt = 0.1
+# N = Int(round(tf/dt) + 1)
 qref = typeof(zeros(7))[]
 push!(qref,  [4.9268856741946365e-05, 0.26016423071338934, 3.140069344584098, -2.27008100955155, -2.40769461674617e-05, 0.9598460188468598, 1.569995694393751])
 push!(qref,  [-0.003768053224579125, 0.26079787208394173, 3.1395327288847428, -2.269096150780195, -0.004224076946167462, 0.9616197667116058, 1.5721591274301712])
@@ -91,68 +99,93 @@ push!(q̇ref,  [-0.07913550270002623, 0.013135786638376092, -0.01112438306764708
 push!(q̇ref,  [-0.002789061073605048, 0.00046295922732875194, -0.00039206908054222056, 0.0007195702127481829, -0.0030686581481977893, 0.0012959585328574108, 0.0015806753369740911])
 push!(q̇ref,  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
 
+# Arthur(; mechanism=RigidBodyDynamics.URDF.parse_urdf(joinpath(@__DIR__,"../descriptions/gen3.urdf"), remove_fixed_tree_joints = false)) = Arthur(mechanism)
 params = MPC_Params()
+model = Arthur()
 
-Xref = typeof(zeros(14))[]
+# ṗref = typeof(zeros(6))[]
+# for k=1:length(q̇ref)
+#     # Calculate the Jacobian at qref[k]
+#     # Use that Jacobian to do ṗ = J * q̇ to get ṗref
+#     set_configuration!(params.state, qref[k])
+#     J = geometric_jacobian(params.state, path(params.model.mechanism, root_body(params.model.mechanism), bodies(params.model.mechanism)[end]))
+#     local vel_vec = Array(J)*q̇ref[k]
+#     # push!(ṗref, [norm(vel_vec[1:3])])
+#     push!(ṗref, vel_vec)
+# end
+
+Xref = typeof(zeros(20))[]
 for k = 1:length(qref)
     push!(Xref, [qref[k]; q̇ref[k]])
 end
-global current_waypoint = 0
 
-function ctrler!(s) 
-    x0 = zeros(14)
-    x0[1:7] = s.d.qpos
-    x0[8:14] = s.d.qvel
-    # println(s.d.site_xpos)
-    println(fieldnames(typeof(s.d)))
-    
-    if current_waypoint == 0
-        set_configuration!(params.state, x0[1:7])
-        set_velocity!(params.state, x0[8:14])
-        i = 1
-        ∆x = Xref[i][1:7] - x0[1:7]
-        Kp = [100, 400, 400, 400, 400, 400, 400]
-        Kd = [100, 100, 100, 100, 100, 100, 100]
-        params.v̇ .= (Kp .* ∆x) .- (Kd .* x0[8:14])
-        u = inverse_dynamics(params.state, params.v̇)
-        # @show "PD_Initial"
-        # @show ∆x
-        # @show norm(x0[8:14])
-        if norm(∆x) < 1e-1 && norm(x0[8:14]) < 1e-3
-            global current_waypoint = 1
-        end
-    elseif current_waypoint > 0 && current_waypoint <= length(Xref)
-        set_configuration!(params.state, x0[1:7])
-        set_velocity!(params.state, x0[8:14])
-        # i = current_waypoint
-        current_waypoint = min(argmin(norm.([(Xref[k][1:7] - x0[1:7]) for k=1:length(Xref)])) + 1, length(Xref))
-        ∆x = Xref[current_waypoint][1:7] - x0[1:7]
-        Kp = [100, 400, 400, 600, 600, 600, 600]
-        Kd = [100, 100, 100, 100, 100, 100, 100]
-        params.v̇ .= (Kp .* ∆x) .- (Kd .* x0[8:14])
-        u = inverse_dynamics(params.state, params.v̇)
-        # @show "PD_Tracking"
-        # @show ∆x
-        # @show norm(x0[8:14])
-        # if current_waypoint != length(Xref)
-        #     if norm(∆x) < 1e-1
-        #         global current_waypoint += 1
-        #     end
-        # else
-        #     if norm(∆x) < 1e-1
-        #         global current_waypoint += 1
-        #     end
-        # end
-    else
-        set_configuration!(params.state, x0[1:7])
-        set_velocity!(params.state, x0[8:14])
-        params.v̇ .= zeros(7)
-        u = inverse_dynamics(params.state, params.v̇)
-        # @show "Grav Comp"
-    end
-    setaction!(s, u)
+for k = 1:params.H
+    push!(Xref, [qref[end]; q̇ref[end]])
 end
 
-d = mujoco_sim.get_data(m) 
-sim = mujoco_sim.MJSim(m,d)   
-mujoco_sim.simulate(sim, controller = ctrler!; mode="active")
+# q0 = [4.9268856741946365e-05, 0.26016423071338934, 3.140069344584098, -2.27008100955155, -2.40769461674617e-05, 0.9598460188468598, 1.569995694393751]
+# q̇0 = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+# set_configuration!(params.state, q0)
+# J0 = geometric_jacobian(params.state, path(params.model.mechanism, root_body(params.model.mechanism), bodies(params.model.mechanism)[end]))
+# vel_vec = Array(J0)*q̇0
+# ṗ0 = vel_vec
+# F0 = [0, 0, 0, 0, 0, 0]
+# global x0 = [q0; q̇0; ṗ0]
+
+global x0 = Xref[1]
+
+global prob_mpc = ArthurHorizonProblem(Xref, x0, params.H, start=1)
+global altro_mpc = ALTROSolver(prob_mpc, params.opts)
+solve!(altro_mpc)
+
+X_traj = typeof(Xref[1])[]
+push!(X_traj, x0)
+U_traj = typeof(zeros(7))[]
+
+t0 = 0
+global iter = 1
+max_iters = length(Xref) + params.H
+global k_mpc = argmin(norm.([(Xref[k][1:7] - x0[1:7]) for k=1:length(Xref)]))
+while norm(X_traj[end] - Xref[end]) > 0.1# && iter < max_iters#&& norm(errors[iter+1] - errors[iter]) > 0.003
+    global iter += 1
+    global t0 += params.dt
+    # Update the ALTRO solution, advancing forward by 1 time step
+    push!(U_traj, control(prob_mpc.Z[1]))
+    global x0 = rk4(prob_mpc.model, state(prob_mpc.Z[1]), control(prob_mpc.Z[1]), params.dt)
+    if norm(Xref[k_mpc][1:7] - x0[1:7]) < 5e-2
+        global k_mpc = min(k_mpc+1, length(Xref))
+    end
+    println(k_mpc)
+    global prob_mpc = ArthurHorizonProblem(Xref, x0, params.H, start=k_mpc)
+    global altro_mpc = ALTROSolver(prob_mpc, params.opts)
+    solve!(altro_mpc)
+    println(X_traj[end] - Xref[k_mpc])
+    # println(norm(prob_mpc.x0[15:17]))
+    push!(X_traj, prob_mpc.x0)
+end
+
+X_sim = typeof(Xref[1])[]
+push!(X_sim, X_traj[1])
+for k = 1:length(X_traj)-1
+    # X_sim[k+1] = discrete_dynamics(TrajectoryOptimization.integration(prob_mpc), params.model, X_sim[k], U_traj[k], 0.0, params.dt)
+    push!(X_sim, rk4(params.model, X_sim[k], U_traj[k], params.dt))
+end
+
+using MeshCat, MeshCatMechanisms, Blink
+urdf = joinpath(@__DIR__,"../descriptions/gen3.urdf")
+body = findbody(model.mechanism, "end_effector_link")
+point = Point3D(default_frame(body), 0., 0, 0)
+# Create the visualizer
+vis = MechanismVisualizer(model.mechanism, URDFVisuals(urdf))
+
+# Render our target point attached to the robot as a sphere with radius 0.07
+setelement!(vis, point, 0.05)
+
+qs = Vector{Float64}[]
+for x in X_traj
+    push!(qs, copy(x[1:7]))
+end
+ts = collect(0:params.dt:(length(qs)-1)*params.dt);
+
+setanimation!(vis, Animation(vis, ts, qs))
+render(vis)
